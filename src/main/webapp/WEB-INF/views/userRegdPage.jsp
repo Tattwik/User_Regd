@@ -16,8 +16,8 @@
 			</div>
 			<div class="card-body">
 				<form action="./saveUser" method="post"
-					enctype="multipart/form-data" onsubmit="return validate()">
-					<input type="hidden" name="uId" id="usrId" value="${user.uId}">
+					enctype="multipart/form-data">
+					<input type="hidden" name="uid" id="usrId" value="${user.uid}">
 					<div class="row">
 						<div class="col-6">
 							<label for="usrNameId" class="font-weight-bold">Enter
@@ -31,8 +31,14 @@
 						</div>
 						<div class="col-6">
 							<label for="usrPassId" class="font-weight-bold">Enter
-								User Password</label> <input type="email" class="form-control"
+								User Password</label> <input type="password" class="form-control"
 								name="password" id="passId" value="${user.password}">
+						</div>
+						<div class="col-6">
+							<label for="addrsId" class="font-weight-bold">Enter User
+								Address</label>
+							<textarea class="form-control" name="address" id="addrsId"
+								rows="2" cols="6"></textarea>
 						</div>
 						<div class="col-6">
 							<label for="countryId" class="font-weight-bold">Select
@@ -40,7 +46,8 @@
 								class="form-control" onchange="findStateByCountryId(this.value)">
 								<option value="0">-select-</option>
 								<c:forEach items="${countyList}" var="country">
-									<option value="${country.cid}">${country.name}</option>
+									<option value="${country.cid}"
+										<c:if test="${country.cid == user.country.cid}">selected='selected'</c:if>>${country.name}</option>
 								</c:forEach>
 							</select>
 						</div>
@@ -57,10 +64,54 @@
 								id="photoId" value="${user.photo}">
 						</div>
 						<div class="col-12 text-center mt-2">
-							<input type="button" class="btn btn-success" value="SUBMIT">
+							<div id="sbtn">
+								<input type="submit" class="btn btn-success" value="SUBMIT">
+							</div>
+							<div id="ubtn" style="display: none;">
+								<input type="button" class="btn btn-success" value="UPDATE"
+									onclick="updateUser()">
+							</div>
 						</div>
 					</div>
 				</form>
+				<table class="table table-bordered table-striped mt-2" id="userTbl">
+					<thead>
+						<tr>
+							<th>SlNo</th>
+							<th>User Id</th>
+							<th>User Name</th>
+							<th>User Email</th>
+							<th>User Address</th>
+							<th>Residing State</th>
+							<th>Residing Country</th>
+							<th>User Photo</th>
+							<th>ACTION</th>
+							<th>ACTION</th>
+						</tr>
+					</thead>
+					<tbody>
+						<c:forEach items="${userList}" var="user" varStatus="counter">
+							<tr>
+								<td>${counter.count}</td>
+								<td>${user.uid}</td>
+								<td>${user.name}</td>
+								<td>${user.email}</td>
+								<td>${user.address}</td>
+								<td>${user.state.name}</td>
+								<td>${user.country.name}</td>
+								<td><a href="./getImage?fileName=${user.photo}">${user.photo}</a></td>
+								<td><input type="button" class="btn btn-primary"
+									onclick="populate(${user.uid} , '${user.name}', 
+											'${user.email}', 
+											'${user.address}'	
+											)"
+									value="UPDATE"></td>
+								<td><a class="btn btn-danger"
+									href="./deleteUser?uId=${user.uid}">DELETE</a></td>
+							</tr>
+						</c:forEach>
+					</tbody>
+				</table>
 			</div>
 		</div>
 	</div>
@@ -76,6 +127,45 @@
 				},
 				success : function(resp) {
 					$('#stateId').html(resp);
+				}
+			});
+		}
+		function populate(id, n, e, a, s, c) {
+			document.getElementById("sbtn").style.display="none";
+			document.getElementById("ubtn").style.display="block";
+			var i = id;
+			var uname = n;
+			var email = e;
+			var address = a;
+			document.getElementById("usrId").value = id;
+			document.getElementById("nameId").value = uname;
+			document.getElementById("emailId").value = email;
+			document.getElementById("addrsId").value = address;
+		}
+		function updateUser(){
+			var u = {};
+			u.uid = $("#usrId").val();
+		    u.name = $('#nameId').val();
+			u.email = $('#emailId').val();
+		    u.password = $('#passId').val();
+			u.address = $('#addrsId').val();
+	        u.country = {
+					cid : $("#countryId option:selected").val(),
+					name : $("#countryId option:selected").text()
+			}
+	        u.state = {
+					sid : $("#stateId option:selected").val(),
+					name : $("#stateId option:selected").text()
+			}
+			u.photo = $("#photoId").val();
+			$.ajax({
+				type : 'POST',
+				url : 'updateUser',
+				data : {
+					User : JSON.stringify(u)
+				},
+				success : function(resp) {
+					
 				}
 			});
 		}

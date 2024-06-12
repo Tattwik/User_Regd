@@ -23,7 +23,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@Table(name = "UserTbl")
+@Table(name = "usertbl")
 @AllArgsConstructor
 @NoArgsConstructor
 public class User implements Serializable {
@@ -41,6 +41,9 @@ public class User implements Serializable {
 	
 	@Column(name="password")
 	private String password;
+	
+	@Column(name="address")
+	private String address;
 	
 	@Column(name="photo")
 	private String photo;
