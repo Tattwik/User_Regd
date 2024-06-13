@@ -1,0 +1,139 @@
+MainController
+=========================================================================================
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/users")
+public class UserController {
+
+    @Autowired
+    private UserService userService;
+
+    // GET endpoint to fetch all active users
+    @GetMapping("/active")
+    public ResponseEntity<List<User>> getAllActiveUsers() {
+        List<User> activeUsers = userService.getAllActiveUsers();
+        return ResponseEntity.ok(activeUsers);
+    }
+
+    // POST endpoint to add a new user
+    @PostMapping("/add")
+    public ResponseEntity<String> addUser(@RequestBody UserRequestDTO userRequestDTO) {
+        int rowsAffected = userService.insertUser(userRequestDTO.getName(), userRequestDTO.getEmail(),
+                userRequestDTO.getPassword(), userRequestDTO.getPhoto(), userRequestDTO.getAddress(),
+                userRequestDTO.getStateId(), userRequestDTO.getCountryId());
+        
+        if (rowsAffected == 1) {
+            return ResponseEntity.status(HttpStatus.CREATED).body("User added successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to add user");
+        }
+    }
+
+    // PUT endpoint to update an existing user
+    @PutMapping("/update/{userId}")
+    public ResponseEntity<String> updateUser(@PathVariable Integer userId, @RequestBody UserRequestDTO userRequestDTO) {
+        int rowsAffected = userService.updateUser(userId, userRequestDTO.getName(), userRequestDTO.getEmail(),
+                userRequestDTO.getPassword(), userRequestDTO.getPhoto(), userRequestDTO.getAddress(),
+                userRequestDTO.getStateId(), userRequestDTO.getCountryId());
+        
+        if (rowsAffected == 1) {
+            return ResponseEntity.ok("User updated successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found or update failed");
+        }
+    }
+
+    // DELETE endpoint to delete a user
+    @DeleteMapping("/delete/{userId}")
+    public ResponseEntity<String> deleteUser(@PathVariable Integer userId) {
+        int rowsAffected = userService.deleteUser(userId);
+        
+        if (rowsAffected == 1) {
+            return ResponseEntity.ok("User deleted successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found or delete failed");
+        }
+    }
+
+    // Other endpoints as needed...
+
+}
+==============================================================================================================================================
+UserServiceImpl
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import tech.csm.domain.User;
+import tech.csm.repository.UserRepo;
+
+import java.util.List;
+
+@Service
+public class UserService {
+
+    @Autowired
+    private UserRepo userRepo;
+
+    public List<User> getAllActiveUsers() {
+        return userRepo.getAllActiveUsers("select");
+    }
+
+    public int insertUser(String user_name, String user_email, String user_password,
+                          String user_photo, String user_address, Integer state_id, Integer country_id) {
+        return userRepo.insertUser("insert", user_name, user_email, user_password,
+                                   user_photo, user_address, state_id, country_id);
+    }
+
+    public int updateUser(Integer user_id, String user_name, String user_email, String user_password,
+                          String user_photo, String user_address, Integer state_id, Integer country_id) {
+        return userRepo.updateUser("update", user_id, user_name, user_email, user_password,
+                                   user_photo, user_address, state_id, country_id);
+    }
+
+    public int deleteUser(Integer user_id) {
+        return userRepo.deleteUser("delete", user_id);
+    }
+
+    // Other service methods as needed...
+
+}
+================================================================================================================================================
+UserRepoImpl
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.query.Procedure;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import tech.csm.domain.User;
+
+import java.util.List;
+
+@Repository
+public interface UserRepo extends JpaRepository<User, Integer> {
+
+    @Procedure(name = "UserProc")
+    List<User> getAllActiveUsers(String action);
+
+    @Transactional
+    @Modifying
+    @Procedure(name = "UserProc")
+    int insertUser(String action, String user_name, String user_email, String user_password,
+                   String user_photo, String user_address, Integer state_id, Integer country_id);
+
+    @Transactional
+    @Modifying
+    @Procedure(name = "UserProc")
+    int updateUser(String action, Integer user_id, String user_name, String user_email, String user_password,
+                   String user_photo, String user_address, Integer state_id, Integer country_id);
+
+    @Transactional
+    @Modifying
+    @Procedure(name = "UserProc")
+    int deleteUser(String action, Integer user_id);
+
+}
