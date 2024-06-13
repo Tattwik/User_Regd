@@ -12,8 +12,8 @@
 <body>
 	<div class="container mt-3">
 		<div class="card">
-			<div class="card-header h2 text-primary">USER REGISTRATION FORM
-			</div>
+			<div class="card-header h2 text-primary" id="head">USER
+				REGISTRATION FORM</div>
 			<div class="card-body">
 				<form action="./saveUser" method="post"
 					enctype="multipart/form-data">
@@ -65,13 +65,10 @@
 						</div>
 						<input type="hidden" name="isdelete" id="delId" value="No">
 						<div class="col-12 text-center mt-2">
-							<div id="sbtn">
-								<input id="subBtn" type="submit" class="btn btn-success" value="SUBMIT">
-							</div>
-							<div id="ubtn" style="display: none;">
-								<input type="button" class="btn btn-success" value="UPDATE"
-									onclick="updateUser()">
-							</div>
+							<input id="subBtn" type="submit" class="btn btn-success"
+								value="SUBMIT"> <input id="cnclBtn" type="button"
+								class="btn btn-warning" value="CANCEL" onclick="cancel()"
+								style="display: none;">
 						</div>
 					</div>
 				</form>
@@ -132,11 +129,13 @@
 			});
 		}
 		function populate(id, n, e, a, s, c) {
+			document.getElementById("head").innerHTML = "UPDATE USER DETAILS"
 			document.getElementById("subBtn").value="UPDATE";
 			document.getElementById("subBtn").classList.remove("btn");
 			document.getElementById("subBtn").classList.remove("btn-success");
 			document.getElementById("subBtn").classList.add("btn");
 			document.getElementById("subBtn").classList.add("btn-primary");
+			document.getElementById("cnclBtn").style.display="inline";
 			var i = id;
 			var uname = n;
 			var email = e;
@@ -146,33 +145,8 @@
 			document.getElementById("emailId").value = email;
 			document.getElementById("addrsId").value = address;
 		}
-		function updateUser(){
-			var u = {};
-			u.uid = $("#usrId").val();
-			document.getElementById("usrId").value = 0;
-		    u.name = $('#nameId').val();
-			u.email = $('#emailId').val();
-		    u.password = $('#passId').val();
-			u.address = $('#addrsId').val();
-	        u.country = {
-					cid : $("#countryId option:selected").val(),
-					name : $("#countryId option:selected").text()
-			}
-	        u.state = {
-					sid : $("#stateId option:selected").val(),
-					name : $("#stateId option:selected").text()
-			}
-			u.photo = $("#photoId").val();
-			$.ajax({
-				type : 'POST',
-				url : 'updateUser',
-				data : {
-					User : JSON.stringify(u)
-				},
-				success : function(resp) {
-					location.reload();
-				}
-			});
+		function cancel() {
+			location.reload();
 		}
 	</script>
 </body>
