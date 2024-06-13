@@ -17,7 +17,7 @@
 			<div class="card-body">
 				<form action="./saveUser" method="post"
 					enctype="multipart/form-data">
-					<input type="hidden" name="uid" id="usrId" value="${user.uid}">
+					<input type="hidden" name="uid" id="usrId" value="0">
 					<div class="row">
 						<div class="col-6">
 							<label for="usrNameId" class="font-weight-bold">Enter
@@ -63,9 +63,10 @@
 								User Photo</label> <input type="file" class="form-control" name="file"
 								id="photoId" value="${user.photo}">
 						</div>
+						<input type="hidden" name="isdelete" id="delId" value="No">
 						<div class="col-12 text-center mt-2">
 							<div id="sbtn">
-								<input type="submit" class="btn btn-success" value="SUBMIT">
+								<input id="subBtn" type="submit" class="btn btn-success" value="SUBMIT">
 							</div>
 							<div id="ubtn" style="display: none;">
 								<input type="button" class="btn btn-success" value="UPDATE"
@@ -131,8 +132,11 @@
 			});
 		}
 		function populate(id, n, e, a, s, c) {
-			document.getElementById("sbtn").style.display="none";
-			document.getElementById("ubtn").style.display="block";
+			document.getElementById("subBtn").value="UPDATE";
+			document.getElementById("subBtn").classList.remove("btn");
+			document.getElementById("subBtn").classList.remove("btn-success");
+			document.getElementById("subBtn").classList.add("btn");
+			document.getElementById("subBtn").classList.add("btn-primary");
 			var i = id;
 			var uname = n;
 			var email = e;
@@ -145,6 +149,7 @@
 		function updateUser(){
 			var u = {};
 			u.uid = $("#usrId").val();
+			document.getElementById("usrId").value = 0;
 		    u.name = $('#nameId').val();
 			u.email = $('#emailId').val();
 		    u.password = $('#passId').val();
@@ -165,7 +170,7 @@
 					User : JSON.stringify(u)
 				},
 				success : function(resp) {
-					
+					location.reload();
 				}
 			});
 		}

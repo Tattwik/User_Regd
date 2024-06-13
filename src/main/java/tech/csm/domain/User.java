@@ -58,4 +58,7 @@ public class User implements Serializable {
     @ManyToOne
     @JoinColumn(name="cid")
     private Country country;
+    
+    @Column(name="isdelete")
+    private String isdelete;
 }

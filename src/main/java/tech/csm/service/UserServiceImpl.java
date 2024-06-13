@@ -25,12 +25,21 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<User> getUsers() {
-		return userRepo.findAll();
+		return userRepo.getAllUsers();
 	}
 
 	@Override
 	public User updateUser(User user) {
 		return userRepo.save(user);
 	}
+
+	@Override
+	public int deleteUser(Integer uid) {
+		return userRepo.deleteUser(uid);
+	}
+
+	
+
+	
 
 }
